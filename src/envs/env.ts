@@ -7,7 +7,6 @@ const envsSchema = z.object({
   DATABASE_URL: z.string(),
   JWT_PK: z.string(),
   JWT_REFRESH_PK: z.string(),
-  AUTH_SERVICE_URL: z.string(),
 });
 
 const { data, error } = envsSchema.safeParse(process.env);
