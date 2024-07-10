@@ -15,7 +15,7 @@ async function bootstrap() {
     }),
   );
 
-  app.enableCors({ origin: '*' });
+  app.enableCors({ origin: '*', methods: '*' });
   
   const config = new DocumentBuilder()
     .setTitle('Auth-Ms Doc')
