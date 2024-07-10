@@ -72,7 +72,7 @@ export class AuthService {
           data: {
             userId: user.id,
             token,
-            origin: origin,
+            origin: "",
           },
         }),
       );
