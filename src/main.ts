@@ -15,8 +15,8 @@ async function bootstrap() {
     }),
   );
 
-  app.enableCors();
-
+  app.enableCors({ origin: '*' });
+  
   const config = new DocumentBuilder()
     .setTitle('Auth-Ms Doc')
     .setDescription('Documentación api auth')
