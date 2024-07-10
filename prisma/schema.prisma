@@ -1,0 +1,134 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Addresses {
+  id                  Int                 @id @default(autoincrement())
+  street_1            String?             @db.VarChar(255)
+  street_2            String?             @db.VarChar(255)
+  description         String?
+  city                String?             @db.VarChar(255)
+  coordinateLatitude  String?             @db.VarChar(255)
+  coordinateLongitude String?             @db.VarChar(255)
+  postalCode          String?             @db.VarChar(255)
+  municipalityId      Int?
+  provinceId          Int?
+  countryId           Int?
+  createdAt           DateTime            @db.Timestamptz(6)
+  updatedAt           DateTime            @db.Timestamptz(6)
+  deletedAt           DateTime?           @db.Timestamptz(6)
+  Countries           Countries?          @relation(fields: [countryId], references: [id], onDelete: NoAction)
+  Municipalities      Municipalities?     @relation(fields: [municipalityId], references: [id], onDelete: NoAction)
+  Provinces           Provinces?          @relation(fields: [provinceId], references: [id], onDelete: NoAction)
+  ListUserAddresses   ListUserAddresses[]
+}
+
+model Countries {
+  id        Int         @id @default(autoincrement())
+  name      String?     @db.VarChar(255)
+  code      String      @unique @db.VarChar(255)
+  createdAt DateTime    @db.Timestamptz(6)
+  updatedAt DateTime    @db.Timestamptz(6)
+  Addresses Addresses[]
+  Provinces Provinces[]
+}
+
+model Images {
+  id        Int      @id @default(autoincrement())
+  path      String?  @db.VarChar(255)
+  src       String?  @db.VarChar(255)
+  thumbnail String?  @db.VarChar(255)
+  blurhash  String?  @db.VarChar(255)
+  userId    Int?
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  Users     Users?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ListUserAddresses {
+  addressId Int
+  userId    Int
+  createdAt DateTime  @db.Timestamptz(6)
+  updatedAt DateTime  @db.Timestamptz(6)
+  Addresses Addresses @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  Users     Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([addressId, userId])
+}
+
+model Municipalities {
+  id         Int         @id @default(autoincrement())
+  name       String?     @db.VarChar(255)
+  code       String      @db.VarChar(255)
+  provinceId Int?
+  createdAt  DateTime    @db.Timestamptz(6)
+  updatedAt  DateTime    @db.Timestamptz(6)
+  deletedAt  DateTime?   @db.Timestamptz(6)
+  Addresses  Addresses[]
+  Provinces  Provinces?  @relation(fields: [provinceId], references: [id], onDelete: NoAction)
+}
+
+model Provinces {
+  id             Int              @id @default(autoincrement())
+  name           String?          @db.VarChar(255)
+  code           String           @db.VarChar(255)
+  countryId      Int?
+  createdAt      DateTime         @db.Timestamptz(6)
+  updatedAt      DateTime         @db.Timestamptz(6)
+  deletedAt      DateTime?        @db.Timestamptz(6)
+  Addresses      Addresses[]
+  Municipalities Municipalities[]
+  Countries      Countries?       @relation(fields: [countryId], references: [id], onDelete: Cascade)
+}
+
+model TemporalTokens {
+  id        Int                       @id @default(autoincrement())
+  token     String                    @db.VarChar(255)
+  type      enum_TemporalTokens_type?
+  expireAt  DateTime?                 @db.Timestamptz(6)
+  userId    Int?
+  createdAt DateTime                  @db.Timestamptz(6)
+  updatedAt DateTime                  @db.Timestamptz(6)
+  Users     Users?                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Tokens {
+  id        Int      @id @default(autoincrement())
+  token     String   @db.VarChar(255)
+  origin    String   @db.VarChar(255)
+  userId    Int
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt() @db.Timestamptz(6)
+  Users     Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Users {
+  id                Int                 @id @default(autoincrement())
+  email             String?             @unique @db.VarChar(255)
+  password          String?             @db.VarChar(255)
+  isActive          Boolean?            @default(false)
+  isSuperAdmin      Boolean?            @default(false)
+  isLogued          Boolean?            @default(false)
+  isEmailConfirmed  Boolean?            @default(false)
+  lastLogin         DateTime?           @db.Timestamptz(6)
+  fullName          String?             @db.VarChar(255)
+  phone             String?             @db.VarChar(255)
+  sex               String?             @db.VarChar(255)
+  createdAt         DateTime            @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime            @updatedAt @db.Timestamptz(6)
+  deletedAt         DateTime?           @db.Timestamptz(6)
+  Images            Images[]
+  ListUserAddresses ListUserAddresses[]
+  TemporalTokens    TemporalTokens[]
+  Tokens            Tokens[]
+}
+
+enum enum_TemporalTokens_type {
+  reset_password
+  email_confirm
+}
