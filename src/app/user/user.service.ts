@@ -83,7 +83,7 @@ export class UserService {
         token: verifyToken,
       };
 
-      firstValueFrom(this.httpService.post<void>(envs.AUTH_SERVICE_URL, body));
+      // firstValueFrom(this.httpService.post<void>(envs.AUTH_SERVICE_URL, body));
     }
 
     return user;
